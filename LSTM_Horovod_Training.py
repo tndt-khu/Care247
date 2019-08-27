@@ -10,6 +10,7 @@ import sys
 import csv
 import shutil
 import os
+from os.path import expanduser
 
 
 from tensorflow.python.framework import dtypes
@@ -30,6 +31,8 @@ l2_loss = 0.0015
 random_seed = 42
 learning_rate = 0.0025
 batch_size = 1024
+# home directory
+home = expanduser("~")
 
 
 def mysql_to_csv(sql, file_path, host, port, user, password, dbName):
@@ -103,8 +106,8 @@ def main(_):
     # delete previous saving checkpoints and model
     if os.path.exists("./checkpoints") and os.path.isdir("./checkpoints"):
         shutil.rmtree("./checkpoints")
-    if os.path.exists("./model") and os.path.isdir("./model"):
-        shutil.rmtree("./model")
+    if os.path.exists(os.path.join(home, 'model')) and os.path.isdir(os.path.join(home, 'model')):
+        shutil.rmtree(os.path.join(home, 'model'))
 
     # Data set sources : http://archive.ics.uci.edu/ml/datasets/ \
     # Smartphone-Based+Recognition+of+Human+Activities+and+Postural+Transitions
@@ -139,8 +142,8 @@ def main(_):
     # This split method cause overfit. We need to K-fold taining method.
     x_train, x_test, y_train, y_test = train_test_split(
         reshaped_segments, labels, test_size=0.2, random_state=random_seed)
-    pickle.dump(x_test, open("./x_test", "wb"))
-    pickle.dump(y_test, open("./y_test", "wb"))
+    pickle.dump(x_test, open(os.path.join(home, 'x_test'), "wb"))
+    pickle.dump(y_test, open(os.path.join(home, 'y_test'), "wb"))
 
     # Build model...
     with tf.name_scope('input'):
@@ -168,8 +171,8 @@ def main(_):
         # Horovod: adjust number of steps based on number of GPUs.
         tf.train.StopAtStepHook(last_step=200 // hvd.size()),
 
-        # tf.train.LoggingTensorHook(tensors={'step': global_step, 'loss': loss},
-        #                            every_n_iter=2),
+        tf.train.LoggingTensorHook(tensors={'step': global_step, 'loss': loss},
+                                   every_n_iter=10),
     ]
 
     # Horovod: pin GPU to be used to process local rank (one GPU per process)
@@ -214,7 +217,7 @@ def main(_):
                 inputs={tf.saved_model.signature_constants.CLASSIFY_INPUTS: inputs_classes},
                 outputs={tf.saved_model.signature_constants.CLASSIFY_OUTPUT_CLASSES: outputs_classes},
                 method_name=tf.saved_model.signature_constants.PREDICT_METHOD_NAME))
-            builder = tf.saved_model.builder.SavedModelBuilder("./model")
+            builder = tf.saved_model.builder.SavedModelBuilder(os.path.join(home, 'model'))
             legacy_init_op = tf.group(tf.tables_initializer(), name='legacy_init_op')
             builder.add_meta_graph_and_variables(sess,
                                                  [tf.saved_model.tag_constants.SERVING],

@@ -1,12 +1,17 @@
 import tensorflow as tf
 import pickle
+import os
+from os.path import expanduser
+
+# home directory
+home = expanduser("~")
 
 # loading
-X_TEST = pickle.load(open("./x_test", "rb"))
-Y_TEST = pickle.load(open("./y_test", "rb"))
+X_TEST = pickle.load(open(os.path.join(home, 'x_test'), "rb"))
+Y_TEST = pickle.load(open(os.path.join(home, 'y_test'), "rb"))
 
 with tf.Session(graph=tf.Graph()) as sess:
-    tf.saved_model.loader.load(sess, [tf.saved_model.tag_constants.SERVING], "./model")
+    tf.saved_model.loader.load(sess, [tf.saved_model.tag_constants.SERVING], os.path.join(home, 'model'))
     graph = tf.get_default_graph()
     x = graph.get_tensor_by_name("input/inputs:0")
     model = graph.get_tensor_by_name("predictor:0")
