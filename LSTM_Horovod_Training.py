@@ -104,10 +104,10 @@ def main(_):
     hvd.init()
 
     # delete previous saving checkpoints and model
-    if os.path.exists('./checkpoints') and os.path.isdir('./checkpoints'):
-        shutil.rmtree('./checkpoints')
-    if os.path.exists(os.path.join(home, 'model')) and os.path.isdir(os.path.join(home, 'model')):
-        shutil.rmtree(os.path.join(home, 'model'))
+    # if os.path.exists('./checkpoints') and os.path.isdir('./checkpoints'):
+    #     shutil.rmtree('./checkpoints')
+    if os.path.exists(os.path.join(home, 'data', 'model')) and os.path.isdir(os.path.join(home, 'data', 'model')):
+        shutil.rmtree(os.path.join(home, 'data', 'model'))
 
     # Data set sources : http://archive.ics.uci.edu/ml/datasets/ \
     # Smartphone-Based+Recognition+of+Human+Activities+and+Postural+Transitions
@@ -142,8 +142,8 @@ def main(_):
     # This split method cause overfit. We need to K-fold taining method.
     x_train, x_test, y_train, y_test = train_test_split(
         reshaped_segments, labels, test_size=0.2, random_state=random_seed)
-    pickle.dump(x_test, open(os.path.join(home, 'x_test'), "wb"))
-    pickle.dump(y_test, open(os.path.join(home, 'y_test'), "wb"))
+    pickle.dump(x_test, open(os.path.join(home, 'data', 'x_test'), "wb"))
+    pickle.dump(y_test, open(os.path.join(home, 'data', 'y_test'), "wb"))
 
     # Build model...
     with tf.name_scope('input'):
@@ -217,7 +217,7 @@ def main(_):
                 inputs={tf.saved_model.signature_constants.CLASSIFY_INPUTS: inputs_classes},
                 outputs={tf.saved_model.signature_constants.CLASSIFY_OUTPUT_CLASSES: outputs_classes},
                 method_name=tf.saved_model.signature_constants.PREDICT_METHOD_NAME))
-            builder = tf.saved_model.builder.SavedModelBuilder(os.path.join(home, 'model'))
+            builder = tf.saved_model.builder.SavedModelBuilder(os.path.join(home, 'data', 'model'))
             legacy_init_op = tf.group(tf.tables_initializer(), name='legacy_init_op')
             builder.add_meta_graph_and_variables(sess,
                                                  [tf.saved_model.tag_constants.SERVING],
