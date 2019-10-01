@@ -11,7 +11,7 @@ import csv
 import shutil
 import os
 from os.path import expanduser
-
+import time
 
 from tensorflow.python.framework import dtypes
 from tensorflow.python.tools import optimize_for_inference_lib
@@ -160,7 +160,9 @@ def main(_):
 
     global_step = tf.train.get_or_create_global_step()
     train_op = optimizer.minimize(loss, global_step=global_step)
-
+	history = dict(train_loss=[], 
+                     step=[], 
+                     time=[])
     hooks = [
         # Horovod: BroadcastGlobalVariablesHook broadcasts initial variable states
         # from rank 0 to all other processes. This is necessary to ensure consistent
@@ -173,6 +175,9 @@ def main(_):
 
         tf.train.LoggingTensorHook(tensors={'step': global_step, 'loss': loss},
                                    every_n_iter=10),
+		history['train_loss'].append(loss)
+		history['step'].append(global_step)		
+		history['time'].append(round(time.monotonic()))
     ]
 
     # Horovod: pin GPU to be used to process local rank (one GPU per process)
