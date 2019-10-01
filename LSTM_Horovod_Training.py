@@ -150,7 +150,7 @@ def main(_):
         x = tf.placeholder(tf.float32, [None, n_time_steps, n_features], name="inputs")
         y = tf.placeholder(tf.float32, [None, n_classes], name="label")
     predict, loss = create_lstm_model(x, y)
-
+    tf.summary.scalar("loss", loss)
     # correct_pred = tf.equal(tf.argmax(predict, 1), tf.argmax(y, 1))
     # accuracy = tf.reduce_mean(tf.cast(correct_pred, dtype=tf.float32))
 
@@ -160,9 +160,7 @@ def main(_):
 
     global_step = tf.train.get_or_create_global_step()
     train_op = optimizer.minimize(loss, global_step=global_step)
-	history = dict(train_loss=[], 
-                     step=[], 
-                     time=[])
+
     hooks = [
         # Horovod: BroadcastGlobalVariablesHook broadcasts initial variable states
         # from rank 0 to all other processes. This is necessary to ensure consistent
@@ -171,13 +169,13 @@ def main(_):
         hvd.BroadcastGlobalVariablesHook(0),
 
         # Horovod: adjust number of steps based on number of GPUs.
-        tf.train.StopAtStepHook(last_step=10000 // hvd.size()),
+        tf.train.StopAtStepHook(last_step=8000 // hvd.size()),
 
         tf.train.LoggingTensorHook(tensors={'step': global_step, 'loss': loss},
                                    every_n_iter=10),
-		history['train_loss'].append(loss)
-		history['step'].append(global_step)		
-		history['time'].append(round(time.monotonic()))
+        tf.train.SummarySaverHook(save_steps=10,
+                                  output_dir='/tmp/tf/',
+                                  summary_op=tf.summary.merge_all())
     ]
 
     # Horovod: pin GPU to be used to process local rank (one GPU per process)
