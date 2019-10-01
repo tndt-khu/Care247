@@ -173,8 +173,8 @@ def main(_):
 
         tf.train.LoggingTensorHook(tensors={'step': global_step, 'loss': loss},
                                    every_n_iter=10),
-        tf.train.SummarySaverHook(save_steps=10,
-                                  output_dir='/root/data/',
+        tf.train.SummarySaverHook(save_secs=10,
+                                  output_dir='/tmp/tf/',
                                   summary_op=tf.summary.merge_all())
     ]
 
