@@ -114,7 +114,7 @@ def main(_):
     # sensorData_timestamp.txt is pre-processed data and is based on UCI datasets.
     # load dataset from DB
     mysql_to_csv(sql='Select * From sensorData', file_path='./sensorData_timestamp1.csv', host='163.180.117.202',
-                 port=3847, user='root', password='password', dbName='hardb')
+                 port=3847, user='root', password='password', dbName='hardbnew')
     columns = ['user', 'activity', 'timestamp', 'acc_x-axis', 'acc_y-axis', 'acc_z-axis', 'gyro_x-axis', 'gyro_y-axis',
                'gyro_z-axis']
     df = pd.read_csv('./sensorData_timestamp1.csv',
