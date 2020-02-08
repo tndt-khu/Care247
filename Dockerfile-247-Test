@@ -1,0 +1,44 @@
+ARG UBUNTU_VERSION=18.04
+
+FROM ubuntu:${UBUNTU_VERSION} as base
+
+ENV TENSORFLOW_VERSION=1.14.0 
+
+ARG python=3.6
+ENV PYTHON_VERSION=${python}
+
+# Set default shell to /bin/bash
+SHELL ["/bin/bash", "-cu"]
+
+RUN apt-get update && apt-get install -y --allow-downgrades --allow-change-held-packages --no-install-recommends \
+        git \
+        curl \
+        vim \
+        wget \
+        ca-certificates \
+        python${PYTHON_VERSION} \
+        python${PYTHON_VERSION}-dev 
+
+RUN if [[ "${PYTHON_VERSION}" == "3.6" ]]; then \
+        apt-get install -y python${PYTHON_VERSION}-distutils; \
+    fi
+
+RUN ln -s /usr/bin/python${PYTHON_VERSION} /usr/bin/python
+
+RUN curl -O https://bootstrap.pypa.io/get-pip.py && \
+    python get-pip.py && \
+    rm get-pip.py
+	
+# Install TensorFlow
+RUN pip install future typing
+RUN pip install numpy \
+        tensorflow==${TENSORFLOW_VERSION} 
+		
+# Download LSTM code
+RUN apt-get install -y --no-install-recommends git-core && \
+	git clone https://616412ff298cacf9a823e868ab336f49eb73b2e4:x-oauth-basic@github.com/tndt-khu/Care247.git && \
+    rm -rf /Care247/.git
+	
+WORKDIR "/Care247"
+
+
