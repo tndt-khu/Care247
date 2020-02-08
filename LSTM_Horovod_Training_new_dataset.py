@@ -30,7 +30,7 @@ n_hidden_units = 64
 l2_loss = 0.0015
 random_seed = 42
 learning_rate = 0.0025
-batch_size = 1024
+batch_size = 512
 # home directory
 home = expanduser("~")
 
