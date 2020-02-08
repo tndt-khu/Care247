@@ -11,7 +11,7 @@ X_TEST = pickle.load(open(os.path.join(home, 'data', 'x_test'), "rb"))
 Y_TEST = pickle.load(open(os.path.join(home, 'data', 'y_test'), "rb"))
 
 with tf.Session(graph=tf.Graph()) as sess:
-    tf.saved_model.loader.load(sess, [tf.saved_model.tag_constants.SERVING], os.path.join(home, 'model'))
+    tf.saved_model.loader.load(sess, [tf.saved_model.tag_constants.SERVING], os.path.join(home, 'data', 'model'))
     graph = tf.get_default_graph()
     x = graph.get_tensor_by_name("input/inputs:0")
     model = graph.get_tensor_by_name("predictor:0")
