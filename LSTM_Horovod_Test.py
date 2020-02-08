@@ -7,8 +7,8 @@ from os.path import expanduser
 home = expanduser("~")
 
 # loading
-X_TEST = pickle.load(open(os.path.join(home, data, 'x_test'), "rb"))
-Y_TEST = pickle.load(open(os.path.join(home, data, 'y_test'), "rb"))
+X_TEST = pickle.load(open(os.path.join(home, 'data', 'x_test'), "rb"))
+Y_TEST = pickle.load(open(os.path.join(home, 'data', 'y_test'), "rb"))
 
 with tf.Session(graph=tf.Graph()) as sess:
     tf.saved_model.loader.load(sess, [tf.saved_model.tag_constants.SERVING], os.path.join(home, 'model'))
