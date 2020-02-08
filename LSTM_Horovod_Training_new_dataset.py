@@ -23,10 +23,10 @@ from tensorflow.python.tools import freeze_graph
 # LSTM Code reference : https://medium.com/@curiousily/human-activity-recognition-using-\
 # lstms-on-android-tensorflow-for-hackers-part-vi-492da5adef64
 
-n_time_steps = 20
+n_time_steps = 100 #20
 n_features = 6
 n_classes = 4
-n_hidden_units = 64
+n_hidden_units = 128 #64
 l2_loss = 0.0015
 random_seed = 42
 learning_rate = 0.0025
