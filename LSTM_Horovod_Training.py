@@ -136,7 +136,10 @@ def main(_):
         labels.append(label)
 
     reshaped_segments = np.asarray(segments, dtype=np.float32).reshape(-1, n_time_steps, n_features)
-    labels = np.asarray(pd.get_dummies(labels), dtype=np.float32)
+    tmp_df = pd.get_dummies(labels)
+    labels = np.asarray(tmp_df, dtype=np.float32)
+    reverse_one_hot_encode = tmp_df.idxmax().reset_index().rename(columns={'index': 'activity', 0: 'idx'})
+    pickle.dump(reverse_one_hot_encode, open(os.path.join(home, 'data', 'reverse_one_hot_encode'), "wb"))
 
     # Data split train : test = 80 : 20
     # This split method cause overfit. We need to K-fold taining method.
@@ -169,12 +172,12 @@ def main(_):
         hvd.BroadcastGlobalVariablesHook(0),
 
         # Horovod: adjust number of steps based on number of GPUs.
-        tf.train.StopAtStepHook(last_step=4000 // hvd.size()),
+        tf.train.StopAtStepHook(last_step=8000 // hvd.size()),
 
         tf.train.LoggingTensorHook(tensors={'step': global_step, 'loss': loss},
                                    every_n_iter=10),
-        tf.train.SummarySaverHook(save_steps=10,
-                                  output_dir='/root/data/',
+        tf.train.SummarySaverHook(save_secs=10,
+                                  output_dir='/tmp/tf',
                                   summary_op=tf.summary.merge_all())
     ]
 

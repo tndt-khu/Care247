@@ -23,10 +23,10 @@ from tensorflow.python.tools import freeze_graph
 # LSTM Code reference : https://medium.com/@curiousily/human-activity-recognition-using-\
 # lstms-on-android-tensorflow-for-hackers-part-vi-492da5adef64
 
-n_time_steps = 400 #20
+n_time_steps = 200
 n_features = 6
 n_classes = 4
-n_hidden_units = 64 #64
+n_hidden_units = 64
 l2_loss = 0.0015
 random_seed = 42
 learning_rate = 0.0025
@@ -136,7 +136,10 @@ def main(_):
         labels.append(label)
 
     reshaped_segments = np.asarray(segments, dtype=np.float32).reshape(-1, n_time_steps, n_features)
-    labels = np.asarray(pd.get_dummies(labels), dtype=np.float32)
+    tmp_df = pd.get_dummies(labels)
+    labels = np.asarray(tmp_df, dtype=np.float32)
+    reverse_one_hot_encode = tmp_df.idxmax().reset_index().rename(columns={'index': 'activity', 0: 'idx'})
+    pickle.dump(reverse_one_hot_encode, open(os.path.join(home, 'data', 'reverse_one_hot_encode'), "wb"))
 
     # Data split train : test = 80 : 20
     # This split method cause overfit. We need to K-fold taining method.
