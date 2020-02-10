@@ -20,7 +20,7 @@ def prediction(data_input):
         x = graph.get_tensor_by_name("input/inputs:0")
         model = graph.get_tensor_by_name("predictor:0")
         # predictor = sess.run(model, {x: X_TEST[1,:,:][None, :, :]})
-        predictor = sess.run(model, {x: X_TEST})
+        predictor = sess.run(model, {x: data_input})
         print(predictor)
         print("reverse_one_hot_encode ", reverse_one_hot_encode['activity'][predictor[0]])
         activity = []
